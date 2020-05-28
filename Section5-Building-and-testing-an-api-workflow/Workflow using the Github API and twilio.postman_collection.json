@@ -1,0 +1,733 @@
+{
+	"info": {
+		"_postman_id": "c4f96daf-26a4-401d-a264-bb6165798631",
+		"name": "Workflow using the Github API and twilio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Trigger OTP Code",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ee1eea17-62a0-4eb4-8f3d-47d912dd9385",
+						"exec": [
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3687723c-fc68-4d0d-84b0-b778216c3ac4",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401, '401 Expected while trigerring an OTP Code');",
+							"});",
+							"",
+							"setTimeout(function(){",
+							"    postman.setNextRequest(\"Get the Github Message from twilio\");",
+							"}, 10000);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/authorizations",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"authorizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get the Github Message from twilio",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "53efd80c-a0fb-4f02-a1d8-4f3c928e7fa6",
+						"exec": [
+							"pm.environment.set(\"twilio_SID\", \"\");",
+							"pm.environment.set(\"twilio_SECRET\", \"\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "50d98bc9-d4e5-4c3a-8ee0-cf10f6c23ada",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"const otp = jsonData.messages[0].body.substring(0,6);",
+							"pm.environment.set(\"OTP\", otp);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200,\"200 Expected while receiving OTP from twilio\");",
+							"});",
+							"postman.setNextRequest(\"Get Github repositories\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{twilio_SECRET}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{twilio_SID}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.twilio.com/2010-04-01/Accounts/:account/Messages.json",
+					"protocol": "https",
+					"host": [
+						"api",
+						"twilio",
+						"com"
+					],
+					"path": [
+						"2010-04-01",
+						"Accounts",
+						":account",
+						"Messages.json"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "account",
+							"value": "{{twilio_account}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Github repositories",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "12f81c7b-7549-4a57-8a15-6e45256e23fb",
+						"exec": [
+							"",
+							"pm.test(\"The expected status code is 200\", function () {",
+							"    pm.response.to.have.status(200,\"While getting repositories status 200 expected\");",
+							"});",
+							"",
+							"postman.setNextRequest(\"Create a Git Repository\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "47b1dc99-0dd3-4255-842a-811fb4936b80",
+						"exec": [
+							"pm.environment.set(\"GitHub_User\",\"\");",
+							"pm.environment.set(\"GitHub_Pwd\",\"\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.github.com/users/{{GitHub_User}}/repos",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"users",
+						"{{GitHub_User}}",
+						"repos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a Git Repository",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a2209aaa-4c88-476b-b931-9f526f4f6ea4",
+						"exec": [
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "09165186-05a5-4769-b85f-b056e187cea6",
+						"exec": [
+							"pm.test(\"The expected status code is 201\", function () {",
+							"    pm.response.to.have.status(201,'status 201 when a repository is created');",
+							"});",
+							"",
+							"postman.setNextRequest(\"Retrieve the newly created  repository\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Test repository\",\r\n  \"description\": \"This is a test repository created by Postman\",\r\n  \"homepage\": \"https://github.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/user/repos",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"user",
+						"repos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve the newly created  repository",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d1c985ae-e414-482c-aade-aa385043e891",
+						"exec": [
+							"pm.environment.set(\"owner\", \"AymarN\");",
+							"pm.environment.set(\"repo\", \"Test-repository\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0689b03a-6180-452d-94c1-d8ae61607cee",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200,'status 200 while retrieving an existing repo');",
+							"});",
+							"",
+							"postman.setNextRequest(\"Create an issue\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{owner}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repo}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create an issue",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2f1569ad-9396-430f-9fd3-c0121088f4ca",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"var number = jsonData.number;",
+							"pm.environment.set(\"number\",jsonData.number);",
+							"pm.test(\"Expected code status 201\", function () {",
+							"    pm.response.to.have.status(201,'status 201 when an issue is created');",
+							"});",
+							"",
+							"postman.setNextRequest(\"Retrieve the new issue created\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Found a Bug\",\r\n  \"body\": \"This issue has been automatically created by Postman\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{owner}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repo}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve the new issue created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3fe6fd61-ca19-426b-b228-975444b62d1d",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"var bug_title = jsonData.title;",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200,'status 200 while retrieving existing issue');",
+							"});",
+							"",
+							"pm.test(\"Check the issue title\", function () {",
+							"    pm.expect(bug_title).to.eql('Found a Bug');",
+							"});",
+							"",
+							"postman.setNextRequest(\"Clean-up\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues/:issue_number",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues",
+						":issue_number"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{owner}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repo}}"
+						},
+						{
+							"key": "issue_number",
+							"value": "{{number}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clean-up",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a5d6e2c-3e0d-4af3-8afa-bf3c7f8efaa9",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204,'must 204 while cleaning the repo');",
+							"});",
+							"",
+							"postman.setNextRequest(\"Fetch the deleted repository\");",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{owner}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repo}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch the deleted repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c5b30d97-0d3e-4e93-9283-d5133d9ed89e",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404,'status must be 404 while fetching');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{GitHub_Pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{owner}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repo}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0a15acf7-b43f-49f6-b11d-db82e8991cb7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "c5d6b4a2-cc1a-4c25-89fd-ea4d07ec64de",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
