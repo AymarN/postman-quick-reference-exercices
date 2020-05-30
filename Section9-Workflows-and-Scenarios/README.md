@@ -4,35 +4,35 @@
 1. Notice: This step requires some JavaScript know-how to complete. If you have trouble getting this to work,<br/>
 do not get frustrated :) Please do check the section call "JavaScript fundamentals" inside this course first.
 
-When creating a new board, instead of My Board, try generating a unique board name by incrementing a number <br/> 
+	When creating a new board, instead of My Board, try generating a unique board name by incrementing a number <br/> 
 (using a pre-request script).
 
-For example the first board you create will be:
+	For example the first board you create will be:
 
-My Board 1
+	My Board 1
 
-The second board:
+	The second board:
 
-My Board 2
+	My Board 2
 
-The third board:
+	The third board:
 
-My Board 3
+	My Board 3
 
-and so on. 
+	and so on. 
 
-Hint #1: Use an environment variable to save the last used number.
+	Hint #1: Use an environment variable to save the last used number.
 
-Hint #2: Take into account that when retrieving a value for a variable that has not been defined, you will get the value null.
+	Hint #2: Take into account that when retrieving a value for a variable that has not been defined, you will get the value null.
 
 2. Use environment variables for any dynamic parts in your requests (boardId, listId) and use them in requests and tests.<br/>
-Replace all usages of global variables in your requests.
+	Replace all usages of global variables in your requests.
 
-How do does your request and tests look like now?
+	How do does your request and tests look like now?
 
 3. Inspect your environment variables after you reached the last request. Clear any variables that you do not need as soon as you do not use them anymore.
 
-What were the lines of code needed to clear the variables?
+	What were the lines of code needed to clear the variables?
 
 4. How was this assignment?
 
@@ -55,9 +55,9 @@ with your account?
 2. Hopefully you have found, very well hidden, the request that could give us all the boards:<br/>
 https://developers.trello.com/v1.0/reference#membersidboards
 
-Try to get this request running. Add this request right at the end of the Trello collection.
+	Try to get this request running. Add this request right at the end of the Trello collection.
 
-Important note: The parameter id is your username. If unsure, just check your Trello profile <br/>
+	Important note: The parameter id is your username. If unsure, just check your Trello profile <br/>
 (click on the imageon the right corner when logged in).
 
 If you are getting the error "Model not found", it means that your username is not correct.
