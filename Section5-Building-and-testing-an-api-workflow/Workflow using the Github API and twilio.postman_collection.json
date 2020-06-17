@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "c4f96daf-26a4-401d-a264-bb6165798631",
-		"name": "Workflow using the Github API and twilio",
+		"_postman_id": "d6161821-76a9-466f-b6ad-6e8573e92dce",
+		"name": "Workflow Github API and twilio  with an api token",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -11,7 +11,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ee1eea17-62a0-4eb4-8f3d-47d912dd9385",
+						"id": "d9f75b18-6ea7-4c6d-a32f-a4f7063b414b",
 						"exec": [
 							"",
 							"",
@@ -23,7 +23,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3687723c-fc68-4d0d-84b0-b778216c3ac4",
+						"id": "183fece7-fe13-4781-a9df-acb1768ffe1b",
 						"exec": [
 							"pm.test(\"Status code is 401\", function () {",
 							"    pm.response.to.have.status(401, '401 Expected while trigerring an OTP Code');",
@@ -56,10 +56,16 @@
 					]
 				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.v3+json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\r\n    \"scopes\": [\"public_repo\"],\r\n     \"note\": \"test\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -87,7 +93,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "53efd80c-a0fb-4f02-a1d8-4f3c928e7fa6",
+						"id": "1dc73361-5779-4060-a314-8d793ddd6b4f",
 						"exec": [
 							"pm.environment.set(\"twilio_SID\", \"\");",
 							"pm.environment.set(\"twilio_SECRET\", \"\");"
@@ -98,7 +104,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "50d98bc9-d4e5-4c3a-8ee0-cf10f6c23ada",
+						"id": "196cd66b-f1a9-4b45-93a9-cb2dfd20f918",
 						"exec": [
 							"var jsonData = pm.response.json();",
 							"const otp = jsonData.messages[0].body.substring(0,6);",
@@ -119,12 +125,12 @@
 					"basic": [
 						{
 							"key": "password",
-							"value": "{{twilio_SECRET}}",
+							"value": "{{AUTH_TOKEN}}",
 							"type": "string"
 						},
 						{
 							"key": "username",
-							"value": "{{twilio_SID}}",
+							"value": "{{twilio_account}}",
 							"type": "string"
 						}
 					]
@@ -155,7 +161,8 @@
 					"variable": [
 						{
 							"key": "account",
-							"value": "{{twilio_account}}"
+							"value": "{{twilio_account}}",
+							"type": "string"
 						}
 					]
 				}
@@ -168,7 +175,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "12f81c7b-7549-4a57-8a15-6e45256e23fb",
+						"id": "1ae8ed2c-f864-426a-9cbc-d5912dcc5511",
 						"exec": [
 							"",
 							"pm.test(\"The expected status code is 200\", function () {",
@@ -184,7 +191,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "47b1dc99-0dd3-4255-842a-811fb4936b80",
+						"id": "d4f0af79-a96f-46ee-a53a-60eb05850ddf",
 						"exec": [
 							"pm.environment.set(\"GitHub_User\",\"\");",
 							"pm.environment.set(\"GitHub_Pwd\",\"\");"
@@ -193,18 +200,16 @@
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -214,11 +219,17 @@
 					{
 						"key": "X-GitHub-OTP",
 						"value": "{{OTP}}",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.nebula-preview+json",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "https://api.github.com/users/{{GitHub_User}}/repos",
+					"raw": "https://api.github.com/users/:username/repos",
 					"protocol": "https",
 					"host": [
 						"api",
@@ -227,8 +238,14 @@
 					],
 					"path": [
 						"users",
-						"{{GitHub_User}}",
+						":username",
 						"repos"
+					],
+					"variable": [
+						{
+							"key": "username",
+							"value": "{{GitHub_User}}"
+						}
 					]
 				}
 			},
@@ -240,7 +257,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a2209aaa-4c88-476b-b931-9f526f4f6ea4",
+						"id": "437b985a-092d-4c06-8aa4-7bb8b1f02849",
 						"exec": [
 							"",
 							"",
@@ -252,7 +269,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "09165186-05a5-4769-b85f-b056e187cea6",
+						"id": "851e2eb8-9081-4ce4-b661-bc2d89f8e705",
 						"exec": [
 							"pm.test(\"The expected status code is 201\", function () {",
 							"    pm.response.to.have.status(201,'status 201 when a repository is created');",
@@ -266,16 +283,11 @@
 			],
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -285,6 +297,11 @@
 					{
 						"key": "X-GitHub-OTP",
 						"value": "{{OTP}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.v3+json",
 						"type": "text"
 					}
 				],
@@ -319,7 +336,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d1c985ae-e414-482c-aade-aa385043e891",
+						"id": "6f61e606-c39a-42e4-bfc6-945bc66c1fce",
 						"exec": [
 							"pm.environment.set(\"owner\", \"AymarN\");",
 							"pm.environment.set(\"repo\", \"Test-repository\");"
@@ -330,7 +347,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0689b03a-6180-452d-94c1-d8ae61607cee",
+						"id": "4cfe6a1f-7771-447d-b191-a8c45b51b069",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200,'status 200 while retrieving an existing repo');",
@@ -344,16 +361,11 @@
 			],
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -399,7 +411,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "2f1569ad-9396-430f-9fd3-c0121088f4ca",
+						"id": "02ab9e54-3b50-43bc-a34d-3f6d95e160c0",
 						"exec": [
 							"var jsonData = pm.response.json();",
 							"var number = jsonData.number;",
@@ -416,16 +428,11 @@
 			],
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -481,7 +488,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3fe6fd61-ca19-426b-b228-975444b62d1d",
+						"id": "5417fa6b-f5a0-4885-8501-3c8cd9a65139",
 						"exec": [
 							"var jsonData = pm.response.json();",
 							"var bug_title = jsonData.title;",
@@ -506,16 +513,11 @@
 			},
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -574,7 +576,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7a5d6e2c-3e0d-4af3-8afa-bf3c7f8efaa9",
+						"id": "da6ba667-36e7-4558-b9c4-9f6a715d7e0d",
 						"exec": [
 							"pm.test(\"Status code is 204\", function () {",
 							"    pm.response.to.have.status(204,'must 204 while cleaning the repo');",
@@ -590,16 +592,11 @@
 			],
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -645,7 +642,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c5b30d97-0d3e-4e93-9283-d5133d9ed89e",
+						"id": "610672bb-3298-4efc-a7a8-abba938b51d7",
 						"exec": [
 							"pm.test(\"Status code is 404\", function () {",
 							"    pm.response.to.have.status(404,'status must be 404 while fetching');",
@@ -657,16 +654,11 @@
 			],
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "bearer",
+					"bearer": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "token",
+							"value": "{{BEARERTOKEN}}",
 							"type": "string"
 						}
 					]
@@ -711,7 +703,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "0a15acf7-b43f-49f6-b11d-db82e8991cb7",
+				"id": "614cef3a-1e30-4e09-9a34-f74ae0230b0a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -721,7 +713,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "c5d6b4a2-cc1a-4c25-89fd-ea4d07ec64de",
+				"id": "d04c5e1e-576a-4241-a625-30053a4c7194",
 				"type": "text/javascript",
 				"exec": [
 					""
