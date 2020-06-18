@@ -217,15 +217,13 @@
 				"method": "GET",
 				"header": [
 					{
-
 						"key": "Accept",
 						"value": "application/vnd.github.nebula-preview+json",
 						"type": "text"
 					}
 				],
 				"url": {
-
-					"raw": "https://api.github.com/users/:username/repos",
+					"raw": "https://api.github.com/user/repos?page=1&per_page=100",
 					"protocol": "https",
 					"host": [
 						"api",
@@ -233,15 +231,17 @@
 						"com"
 					],
 					"path": [
-
-						"users",
-						":username",
+						"user",
 						"repos"
 					],
-					"variable": [
+					"query": [
 						{
-							"key": "username",
-							"value": "{{GitHub_User}}"
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "100"
 						}
 					]
 				}
