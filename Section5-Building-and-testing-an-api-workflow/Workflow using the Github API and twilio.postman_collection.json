@@ -25,8 +25,8 @@
 					"script": {
 						"id": "183fece7-fe13-4781-a9df-acb1768ffe1b",
 						"exec": [
-							"pm.test(\"Status code is 401\", function () {",
-							"    pm.response.to.have.status(401, '401 Expected while trigerring an OTP Code');",
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404, '404 Expected while trying to authenticate with Oauth2');",
 							"});",
 							"",
 							"setTimeout(function(){",
@@ -41,16 +41,21 @@
 			],
 			"request": {
 				"auth": {
-					"type": "basic",
-					"basic": [
+					"type": "oauth2",
+					"oauth2": [
 						{
-							"key": "password",
-							"value": "{{GitHub_Pwd}}",
+							"key": "accessToken",
+							"value": "{{AUTH_TOKEN}}",
 							"type": "string"
 						},
 						{
-							"key": "username",
-							"value": "{{GitHub_User}}",
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
 							"type": "string"
 						}
 					]
@@ -61,11 +66,16 @@
 						"key": "Accept",
 						"value": "application/vnd.github.v3+json",
 						"type": "text"
+					},
+					{
+						"key": "X-GitHub-OTP",
+						"value": " required; sms",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"scopes\": [\"public_repo\"],\r\n     \"note\": \"test\"\r\n}",
+					"raw": "{\r\n    \"message\":\"Must specify two-factor authentication OTP code.\",\r\n    \"documentation_url\":\"https://developer.github.com/v3/auth#working-with-two-factor-authentication\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -73,15 +83,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://api.github.com/authorizations",
+					"raw": "https://api.github.com",
 					"protocol": "https",
 					"host": [
 						"api",
 						"github",
 						"com"
-					],
-					"path": [
-						"authorizations"
 					]
 				}
 			},
@@ -205,11 +212,21 @@
 			},
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
+					"type": "oauth2",
+					"oauth2": [
 						{
-							"key": "token",
-							"value": "{{BEARERTOKEN}}",
+							"key": "accessToken",
+							"value": "{{AUTH_TOKEN}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
 							"type": "string"
 						}
 					]
@@ -219,6 +236,11 @@
 					{
 						"key": "Accept",
 						"value": "application/vnd.github.nebula-preview+json",
+						"type": "text"
+					},
+					{
+						"key": "X-GitHub-OTP",
+						"value": "{{OTP}}",
 						"type": "text"
 					}
 				],
@@ -304,7 +326,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Test repository\",\r\n  \"description\": \"This is a test repository created by Postman\",\r\n  \"homepage\": \"https://github.com\"\r\n}",
+					"raw": "{\r\n  \"name\": \"Test repository\",\r\n  \"description\": \"This is a test repository created by Postman\",\r\n  \"homepage\": \"https://github.com\",\r\n  \"private\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -651,11 +673,21 @@
 			],
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
+					"type": "oauth2",
+					"oauth2": [
 						{
-							"key": "token",
-							"value": "{{BEARERTOKEN}}",
+							"key": "accessToken",
+							"value": "0c261b8bcb59d061aef647010db078409f9f01b5",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
 							"type": "string"
 						}
 					]
