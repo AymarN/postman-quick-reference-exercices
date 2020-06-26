@@ -45,7 +45,7 @@
 					"oauth2": [
 						{
 							"key": "accessToken",
-							"value": "{{AUTH_TOKEN}}",
+							"value": "{{OUAHT2TOKEN}}",
 							"type": "string"
 						},
 						{
@@ -102,7 +102,7 @@
 					"script": {
 						"id": "1dc73361-5779-4060-a314-8d793ddd6b4f",
 						"exec": [
-							"pm.environment.set(\"twilio_SID\", \"\");",
+							"pm.environment.set(\"twilio_API_SID\", \"\");",
 							"pm.environment.set(\"twilio_SECRET\", \"\");"
 						],
 						"type": "text/javascript"
@@ -216,7 +216,7 @@
 					"oauth2": [
 						{
 							"key": "accessToken",
-							"value": "{{AUTH_TOKEN}}",
+							"value": "{{OUAHT2TOKEN}}",
 							"type": "string"
 						},
 						{
